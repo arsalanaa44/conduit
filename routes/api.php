@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
-
+use App\Http\Controllers\API\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,15 +23,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(UserController::class)->group(function () {
 
     Route::prefix('users')->group(function () {
-
-        Route::post('/', [UserController::class, 'register']);
-        Route::post('/login', [UserController::class, 'login']);
+        Route::post('/', 'register');
+        Route::post('/login', 'login');
     });
 
     Route::prefix('user')->group(function () {
-        Route::get('/', [UserController::class, 'getCurrentUser']);
-        Route::put('/', [UserController::class, 'updateCurrentUser']);
+        Route::get('/', 'getCurrentUser');
+        Route::put('/', 'updateCurrentUser');
     });
 
 });
 
+Route::controller(ProfileController::class)->group(function () {
+
+    Route::prefix('profiles/{username}')->group(function () {
+        Route::get('/', 'getProfile');
+        Route::post('/follow', 'followUser');
+        Route::delete('/follow', 'unfollowUser');
+    });
+
+});
