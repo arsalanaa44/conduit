@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests\User\RegisterValidation;
 use App\Http\Requests\User\LoginValidation;
+use App\Http\Requests\User\UpdateValidation;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -125,36 +126,29 @@ class UserController extends Controller
         $user->token = $request->bearerToken();
         return new UserResource($user);
     }
-    public function updateCurrentUser(Request $request)
+
+    public function updateCurrentUser(UpdateValidation $request)
     {
-        $user = Auth::user(); // Get the currently authenticated user
+        $user = Auth::user();
 
-        $data = $request->validate([
-            'user.email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'user.username' => 'sometimes|required|unique:users,username,' . $user->id,
-            'user.password' => 'sometimes|required|min:8',
-            'user.bio' => 'sometimes|string',
-            'user.image' => 'sometimes|url'
-        ]);
-
-        if (isset($data['user']['email'])) {
-            $user->email = $data['user']['email'];
+        if (isset($request['user']['email'])) {
+            $user->email = $request['user']['email'];
         }
 
-        if (isset($data['user']['username'])) {
-            $user->username = $data['user']['username'];
+        if (isset($request['user']['username'])) {
+            $user->username = $request['user']['username'];
         }
 
-        if (isset($data['user']['password'])) {
-            $user->password = bcrypt($data['user']['password']);
+        if (isset($request['user']['password'])) {
+            $user->password = bcrypt($request['user']['password']);
         }
 
-        if (isset($data['user']['bio'])) {
-            $user->bio = $data['user']['bio'];
+        if (isset($request['user']['bio'])) {
+            $user->bio = $request['user']['bio'];
         }
 
-        if (isset($data['user']['image'])) {
-            $user->image = $data['user']['image'];
+        if (isset($request['user']['image'])) {
+            $user->image = $request['user']['image'];
         }
 
         $user->save();
