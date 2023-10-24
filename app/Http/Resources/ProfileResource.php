@@ -14,12 +14,7 @@ class ProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'profile' => [
-                'username' => $this->username,
-                'bio' => $this->bio,
-                'image' => $this->image,
-                'following' => $this->is_followed_by_authenticated_user
-            ]
+            'profile' => new AuthorResource($this)
         ];
     }
 }

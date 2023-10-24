@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,3 +44,13 @@ Route::controller(ProfileController::class)->group(function () {
     });
 
 });
+
+Route::prefix('articles')->group(function () {
+    Route::get('/', [ArticleController::class, 'index']);
+    Route::get('/feed', [ArticleController::class, 'feed']);
+    Route::get('{slug}', [ArticleController::class, 'show']);
+    Route::post('/', [ArticleController::class, 'store']);
+    Route::put('{slug}', [ArticleController::class, 'update']);
+    Route::delete('{slug}', [ArticleController::class, 'destroy']);
+});
+
