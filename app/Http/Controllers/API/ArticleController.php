@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
+use App\Models\Tag;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use Illuminate\Http\Request;
@@ -52,10 +52,32 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
+
+        $validatedData = $request->validate([
+            'article.title' => 'required|string|max:255',
+            'article.description' => 'required|string',
+            'article.body' => 'required|string',
+            'article.tagList' => 'nullable|array',
+            'article.tagList.*' => 'string|max:255', // validates each item in the array
+        ]);
+
+        // Create the article
+
         $article = new Article($request->get('article'));
         $article->user_id = auth()->id();
         $article->slug = Str::slug($article->title);
         $article->save();
+        // Process the tags
+        $tags = $validatedData['article']['tagList'] ?? [];
+
+        foreach ($tags as $tagName) {
+            // Use the firstOrCreate method to get the tag or create it if it doesn't exist
+            $tag = Tag::firstOrCreate(['name' => $tagName]);
+            $tagIds[] = $tag->id;
+        }
+
+        // Attach tags to the article
+        $article->tags()->sync($tagIds);
 
         return new ArticleResource($article);
     }
