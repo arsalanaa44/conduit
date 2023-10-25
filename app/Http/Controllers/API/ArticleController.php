@@ -64,6 +64,11 @@ class ArticleController extends Controller
     public function destroy($slug)
     {
         $article = Article::where('slug', $slug)->firstOrFail();
+
+        if ($article->user_id !== Auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $article->delete();
 
         return response()->json(['message' => 'Article deleted']);
