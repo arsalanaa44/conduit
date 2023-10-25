@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\MultiArticleResource;
@@ -44,11 +45,12 @@ class ArticleController extends Controller
     public function update(Request $request, $slug)
     {
         $article = Article::where('slug', $slug)->firstOrFail();
-        $article->update($request->get('article'));
 
-        // Update slug if title changed
-        if ($request->has('article.title')) {
-            $article->slug = Str::slug($request->get('article.title'));
+        $data = Arr::only($request->input('article', []), ['title', 'description', 'body']);
+        $article->update($data);
+
+        if (isset($data['title'])) {
+            $article->slug = Str::slug($data['title']);
             $article->save();
         }
 
