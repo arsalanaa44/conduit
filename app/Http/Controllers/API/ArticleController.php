@@ -17,7 +17,16 @@ class ArticleController extends Controller
     }
     public function index(Request $request)
     {
-        $articles = Article::latest()->paginate(2); // Default pagination
+        $query = Article::query();
+        $query->orderBy('created_at', 'desc');
+
+        $limit = $request->input('limit', 3);
+        $query->take($limit);
+
+        $offset = $request->input('offset', 0);
+        $query->skip($offset);
+
+        $articles = $query->get();
         return new MultiArticleResource($articles);
     }
 
