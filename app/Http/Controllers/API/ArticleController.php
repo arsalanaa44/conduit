@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\MultiArticleResource;
-
+use Illuminate\Support\Facades\Auth;
 class ArticleController extends Controller
 {
     public function __construct(){
@@ -23,7 +23,16 @@ class ArticleController extends Controller
 
     public function feed(Request $request)
     {
-        // Get articles of users the authenticated user follows
+        //{{APIURL}}/articles/feed?limit=3&offset=3
+            $followedUsers = Auth::user()->following()->pluck('users.id');
+
+            $articles = Article::whereIn('user_id', $followedUsers)
+                ->orderBy('created_at', 'desc')
+                ->limit($request->input('limit', 10))  // Default
+                ->offset($request->input('offset', 0))  // Default
+                ->get();
+
+            return new MultiArticleResource($articles);
     }
 
     public function show($slug)
