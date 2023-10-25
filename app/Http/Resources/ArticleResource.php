@@ -20,11 +20,9 @@ class ArticleResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'body' => $this->body,
-            'tagList' => $this->tags->pluck('name'), // this line gets the names of the tags
+            'tagList' => $this->tags->pluck('name'),
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
-            'favorited' => false,
-            'favoritesCount' => 0,
             'author' => new AuthorResource($this->user)
         ];
     }
