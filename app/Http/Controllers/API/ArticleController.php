@@ -49,6 +49,10 @@ class ArticleController extends Controller
         $data = Arr::only($request->input('article', []), ['title', 'description', 'body']);
         $article->update($data);
 
+        if ($article->user_id !== Auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         if (isset($data['title'])) {
             $article->slug = Str::slug($data['title']);
             $article->save();
