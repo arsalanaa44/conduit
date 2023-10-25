@@ -18,6 +18,22 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $query = Article::query();
+
+        // Filter by tag
+        if ($request->has('tag')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('name', $request->tag);
+            });
+        }
+
+        // Filter by author's username
+        if ($request->has('author')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('username', $request->author);
+            });
+        }
+
+
         $query->orderBy('created_at', 'desc');
 
         $limit = $request->input('limit', 3);
