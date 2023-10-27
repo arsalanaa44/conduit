@@ -13,6 +13,8 @@ use App\Http\Requests\User\UpdateValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserResource;
+//use App\Http\Controllers\WalletController;
+
 
 class UserController extends Controller
 {
@@ -106,6 +108,8 @@ class UserController extends Controller
     public function register(RegisterValidation $request)
     {
         $user = $this->create($request);
+
+        WalletController::createAndInitializeWallet($user);
 
         $loginRequest = new LoginValidation();
         $loginRequest->merge([

@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\API\ArticleController;
+use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\ProfileController;
-use App\Http\Controllers\API\ArticleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,3 +55,4 @@ Route::prefix('articles')->group(function () {
     Route::delete('{slug}', [ArticleController::class, 'destroy']);
 });
 
+Route::post('/wallet/increase-balance', [WalletController::class,'increaseBalance']);
