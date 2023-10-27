@@ -55,4 +55,9 @@ Route::prefix('articles')->group(function () {
     Route::delete('{slug}', [ArticleController::class, 'destroy']);
 });
 
-Route::post('/wallet/increase-balance', [WalletController::class,'increaseBalance']);
+Route::prefix('wallet')->group(function () {
+
+    Route::post('/increase-balance', [WalletController::class, 'increaseBalance']);
+    Route::post('/transfer', [WalletController::class, 'transfer']);
+
+});
