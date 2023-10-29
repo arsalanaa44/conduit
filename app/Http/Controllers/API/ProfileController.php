@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function __construct()
     {
 
-        $this->middleware('auth:api', ['except' => ['getProfile', 'followUser']]);
+        $this->middleware('auth:api', ['except' => ['getProfile']]);
 
     }
     public function getProfile($username)
