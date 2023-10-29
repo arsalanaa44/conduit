@@ -13,14 +13,10 @@ class WalletController extends Controller
 {
     public static function createAndInitializeWallet(User $user)
     {
-
-        if (!$user->wallet) {
             Wallet::create([
                 'user_id' => $user->id,
                 'balance' => 0
             ]);
-        }
-
     }
 
     public function increaseBalance(Request $request)

@@ -11,116 +11,61 @@ use App\Http\Requests\User\LoginValidation;
 use App\Http\Requests\User\UpdateValidation;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserResource;
-//use App\Http\Controllers\WalletController;
+
+use App\Services\UserService;
 
 
 class UserController extends Controller
 {
-
-    public function __construct()
+    protected UserService $userService;
+    public function __construct(UserService $userService)
     {
-
+        $this->userService = $userService;
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
 
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(RegisterValidation $request)
-    {
-        return User::create([
-            'username' => $request->user['username'],
-            'email' => $request->user['email'],
-            'password' => Hash::make($request->user['password']),
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(User $user)
-    {
-        //
     }
 
     public function login(LoginValidation $request)
     {
         $credentials = $request->input('user', ['email', 'password']);
+        $result = $this->userService->login(
+            $credentials['email'],
+            $credentials['password']
+        );
 
-
-        $token = Auth::attempt($credentials);
-
-        if (!$token) {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 401);
+        if (!$result) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $user = Auth::user();
-        $user->token = $token;
+        $user = $result['user'];
+        $user->token = $result['token'];
 
         return new UserResource($user);
     }
 
     public function register(RegisterValidation $request)
     {
-        $user = $this->create($request);
 
-        WalletController::createAndInitializeWallet($user);
+        $this->userService->create(
+            $request->user['username'],
+            $request->user['email'],
+            $request->user['password']
+        );
 
-        $loginRequest = new LoginValidation();
-        $loginRequest->merge([
-            'user' => [
-                'email' => $request->input('user.email'),
-                'password' => $request->input('user.password')
-            ]
-        ]);
+        $result = $this->userService->login(
+            $request->user['email'],
+            $request->user['password']
+        );
 
-        return $this->login($loginRequest);
-    }
+        if (!$result) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $user = $result['user'];
+        $user->token = $result['token'];
+
+        return new UserResource($user);}
 
     public function getCurrentUser(Request $request)
     {
@@ -130,29 +75,15 @@ class UserController extends Controller
         $user->token = $request->bearerToken();
         return new UserResource($user);
     }
-
     public function updateCurrentUser(UpdateValidation $request)
     {
         $user = Auth::user();
 
-        if (isset($request['user']['email'])) {
-            $user->email = $request['user']['email'];
-        }
+        $validatedData = $request->validated();
+        $user->fill($validatedData['user']);
 
-        if (isset($request['user']['username'])) {
-            $user->username = $request['user']['username'];
-        }
-
-        if (isset($request['user']['password'])) {
-            $user->password = bcrypt($request['user']['password']);
-        }
-
-        if (isset($request['user']['bio'])) {
-            $user->bio = $request['user']['bio'];
-        }
-
-        if (isset($request['user']['image'])) {
-            $user->image = $request['user']['image'];
+        if (isset($validatedData['user']['password'])) {
+            $user->password = bcrypt($validatedData['user']['password']);
         }
 
         $user->save();
@@ -160,5 +91,6 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
+
 
 }
