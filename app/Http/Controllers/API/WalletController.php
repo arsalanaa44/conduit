@@ -77,11 +77,22 @@ class WalletController extends Controller
             }
 
             if ($senderWallet->balance >= $amount) {
-                Transaction::create([
-                    'sender_wallet_id' => $senderWallet->id,
-                    'receiver_wallet_id' => $receiverWallet->id,
-                    'amount' => $amount,
+
+                $transaction = new Transaction([
+                    'amount' => -$amount,
+                    'action' => 'SEND',
+                    'description' => 'send with transfer method',
+                    'meta_data' => 'send to:'.$receiverWallet->user->name,
                 ]);
+                $senderWallet->transactions()->save($transaction);
+
+                $transaction = new Transaction([
+                    'amount' => $amount,
+                    'action' => 'RECEIVE',
+                    'description' => 'receive with transfer method',
+                    'meta_data' => 'receive from:'.$senderWallet->user->name,
+                ]);
+                $receiverWallet->transactions()->save($transaction);
 
                 $senderWallet->decrement('balance', $amount);
                 $receiverWallet->increment('balance', $amount);
