@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Wallet;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -28,9 +29,18 @@ class WalletController extends Controller
         $user = auth()->user();
 
         return DB::transaction(function () use ($user, $request) {
-            $wallet = $user->wallet()->lockForUpdate()->first();
+            $wallet = $user->wallet()->lockForUpdate()->firstOrFail();
+            $amount = $request->input('amount');
 
-            $wallet->balance += $request->input('amount');
+            $transaction = new Transaction([
+                'amount' => $amount,
+                'action' => 'CHARGE',
+                'description' => 'Wallet recharge',
+                'meta_data' => '',
+            ]);
+            $wallet->transactions()->save($transaction);
+
+            $wallet->balance += $amount;
             $wallet->save();
 
             return response()->json(['message' => 'Balance increased successfully', 'data' => $wallet]);
@@ -67,11 +77,11 @@ class WalletController extends Controller
             }
 
             if ($senderWallet->balance >= $amount) {
-//                Transaction::create([
-//                    'sender_wallet_id' => $senderWallet->id,
-//                    'receiver_wallet_id' => $receiverWallet->id,
-//                    'amount' => $amount,
-//                ]);
+                Transaction::create([
+                    'sender_wallet_id' => $senderWallet->id,
+                    'receiver_wallet_id' => $receiverWallet->id,
+                    'amount' => $amount,
+                ]);
 
                 $senderWallet->decrement('balance', $amount);
                 $receiverWallet->increment('balance', $amount);
