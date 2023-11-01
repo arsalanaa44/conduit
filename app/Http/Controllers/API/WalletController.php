@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\enum\TransactionTypeEnum;
+use function MongoDB\BSON\toJSON;
 
 
 class WalletController extends Controller
@@ -83,7 +84,7 @@ class WalletController extends Controller
                     'amount' => -$amount,
                     'action' => TransactionTypeEnum::SEND,
                     'description' => 'send with transfer method',
-                    'meta_data' => 'send to:'.$receiverWallet->user->name,
+                    'meta_data' => ['send_to' => $receiverWallet->id],
                 ]);
                 $senderWallet->transactions()->save($transaction);
 
@@ -91,7 +92,7 @@ class WalletController extends Controller
                     'amount' => $amount,
                     'action' => TransactionTypeEnum::RECEIVE,
                     'description' => 'receive with transfer method',
-                    'meta_data' => 'receive from:'.$senderWallet->user->name,
+                    'meta_data' => ['receive_from'=> $senderWallet->id],
                 ]);
                 $receiverWallet->transactions()->save($transaction);
 

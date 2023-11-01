@@ -18,4 +18,15 @@ class Transaction extends Model
     protected $casts = [
         'action' => TransactionTypeEnum::class,
     ];
+
+    public function getMetaDataAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    // Define mutator to encode JSON data when setting
+    public function setMetaDataAttribute($value)
+    {
+        $this->attributes['meta_data'] = json_encode($value);
+    }
 }
