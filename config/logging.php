@@ -52,6 +52,13 @@ return [
     */
 
     'channels' => [
+
+        'transactions' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/transactions.log'), // Specify the path to your log file
+            'level' => 'info', // Specify the log level you want to use
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
@@ -126,6 +133,7 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
     ],
 
 ];
