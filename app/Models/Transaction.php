@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\enum\TransactionTypeEnum;
 
 class Transaction extends Model
 {
@@ -14,4 +15,7 @@ class Transaction extends Model
     {
         return $this->belongsTo(Wallet::class);
     }
+    protected $casts = [
+        'action' => TransactionTypeEnum::class,
+    ];
 }

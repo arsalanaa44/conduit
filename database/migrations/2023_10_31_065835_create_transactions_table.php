@@ -11,7 +11,10 @@ class CreateTransactionsTable extends Migration
             $table->id();
             $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->enum('action', ['SEND', 'RECEIVE', 'CHARGE']);
+
+            // enum
+            $table->string('action');
+
             $table->text('description')->nullable();
             $table->string('meta_data')->nullable();
             $table->timestamps();

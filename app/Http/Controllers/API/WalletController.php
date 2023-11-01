@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\enum\TransactionTypeEnum;
 
 
 class WalletController extends Controller
@@ -34,7 +35,7 @@ class WalletController extends Controller
 
             $transaction = new Transaction([
                 'amount' => $amount,
-                'action' => 'CHARGE',
+                'action' => TransactionTypeEnum::CHARGE,
                 'description' => 'Wallet recharge',
                 'meta_data' => '',
             ]);
@@ -80,7 +81,7 @@ class WalletController extends Controller
 
                 $transaction = new Transaction([
                     'amount' => -$amount,
-                    'action' => 'SEND',
+                    'action' => TransactionTypeEnum::SEND,
                     'description' => 'send with transfer method',
                     'meta_data' => 'send to:'.$receiverWallet->user->name,
                 ]);
@@ -88,7 +89,7 @@ class WalletController extends Controller
 
                 $transaction = new Transaction([
                     'amount' => $amount,
-                    'action' => 'RECEIVE',
+                    'action' => TransactionTypeEnum::RECEIVE,
                     'description' => 'receive with transfer method',
                     'meta_data' => 'receive from:'.$senderWallet->user->name,
                 ]);
