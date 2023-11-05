@@ -40,6 +40,24 @@ class UserControllerTest extends TestCase
                 ]
             ]);
     }
+    public function test_unsuccessful_login()
+    {
+        // Arrange
+        $loginData = [
+            'user' => [
+                'email' => 'nonexistentuser@example.com',
+                'password' => 'wrongpassword',
+            ]
+        ];
+
+        // Act
+        $response = $this->postJson('/api/v1/users/login', $loginData);
+
+        // Assert
+        $response->assertStatus(401)
+            ->assertJson(['message' => 'Unauthorized']);
+    }
+
 
 
 }
