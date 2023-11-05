@@ -47,11 +47,15 @@ class UserController extends Controller
     public function register(RegisterValidation $request)
     {
 
-        $this->userService->create(
+        $user = $this->userService->create(
             $request->user['username'],
             $request->user['email'],
             $request->user['password']
         );
+
+        if (!$user) {
+            return response()->json(['message' => 'Registration failed'], 500);
+        }
 
         $result = $this->userService->login(
             $request->user['email'],

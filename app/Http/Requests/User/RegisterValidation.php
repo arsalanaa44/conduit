@@ -22,8 +22,8 @@ class RegisterValidation extends FormRequest
     public function rules(): array
     {
         return [
-            'user.username' => 'required|string|max:255',
-            'user.email' => 'required|string|email|max:255',
+            'user.username' => 'required|string|max:255|unique:users,username',
+            'user.email' => 'required|string|email|max:255|unique:users,email',
             'user.password' => 'required|string|min:6',
         ];
     }
